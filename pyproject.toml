@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "review-kit"
+version = "0.0.1"
+description = "The shared client for routing a requires_human_review escalation to an Hrz7-compatible Human-Review & Maker-Checker Console: a small, domain-neutral review-submission primitive plus an in-memory outbox, so every producer submits reviews the same way (rule R8) instead of copy-pasting an HTTP call."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Ashish Awasthi" }]
+keywords = ["maker-checker", "human-review", "four-eyes", "s2s", "outbox", "hrz7"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.12",
+]
+
+# ZERO runtime dependencies (pure stdlib), exactly like pii-kit. A leaf commons that consumers
+# pin cannot itself pull another git+https commons: the nested tag-vs-SHA direct-URL reference
+# conflicts at install time with the consumer's own lockfile pin of that commons. The small S2S
+# client helpers (bearer + HMAC-signed actor headers, https-only url guard) are therefore inlined
+# and kept byte-for-byte wire-compatible with hex-service-kit's server verifier.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff==0.15.18",
+  "mypy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/portable-genai/review-kit"
+Source = "https://github.com/portable-genai/review-kit"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/review_kit"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
