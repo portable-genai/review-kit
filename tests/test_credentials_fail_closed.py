@@ -4,13 +4,13 @@ Neither credential may be a two-state read: ``os.environ.get(name, "")``, where 
 "set to nothing" collapse into the same empty string and the empty string means "carry on without
 it". Two concrete fail-opens follow from that read.
 
-* A producer pointed at a REMOTE console with no ``HRZ7_S2S_TOKEN`` submits the review with no
+* A producer pointed at a REMOTE console with no ``HUMAN_REVIEW_S2S_TOKEN`` submits the review with no
   ``Authorization`` header at all, and only finds out at the far end (or, against a console whose
   own S2S policy is unconfigured, does not find out).
 * A blank-but-set value counts as configured. An unstripped read, unlike
   ``hex_service_kit.s2s.client_headers`` which this file claims to stay wire-identical to, sends
-  ``Authorization: Bearer`` with nothing behind it for ``HRZ7_S2S_TOKEN=" "``, and
-  ``HRZ7_S2S_SIGNING_KEY=" "`` HMAC-signs the actor assertion with a blank, publicly guessable
+  ``Authorization: Bearer`` with nothing behind it for ``HUMAN_REVIEW_S2S_TOKEN=" "``, and
+  ``HUMAN_REVIEW_S2S_SIGNING_KEY=" "`` HMAC-signs the actor assertion with a blank, publicly guessable
   key: a signature that attests nothing while looking like it attests the submitter.
 
 The loopback console keeps the zero-secret posture, because that is the same carve-out the
@@ -27,8 +27,8 @@ import pytest
 
 from review_kit import Review, ReviewClient
 
-_TOKEN_ENV = "HRZ7_S2S_TOKEN"
-_KEY_ENV = "HRZ7_S2S_SIGNING_KEY"
+_TOKEN_ENV = "HUMAN_REVIEW_S2S_TOKEN"
+_KEY_ENV = "HUMAN_REVIEW_S2S_SIGNING_KEY"
 _REMOTE = "https://review.internal"
 _LOOPBACK = "http://localhost:8087"
 
