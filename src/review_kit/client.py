@@ -142,8 +142,8 @@ class ReviewClient:
         base_url: str,
         *,
         service: str = "hrz7-review-console",
-        token_env: str = "HRZ7_S2S_TOKEN",
-        signing_key_env: str = "HRZ7_S2S_SIGNING_KEY",
+        token_env: str = "HUMAN_REVIEW_S2S_TOKEN",
+        signing_key_env: str = "HUMAN_REVIEW_S2S_SIGNING_KEY",
         timeout: float = 10.0,
         transport: Transport | None = None,
     ) -> None:

@@ -49,14 +49,14 @@ submitting service is the trust anchor on this path.
 Both env vars are resolved in three states (unset, set-and-blank, set-and-valid) and unset is not
 a member of the valid set:
 
-| Console | `HRZ7_S2S_TOKEN` | Result |
+| Console | `HUMAN_REVIEW_S2S_TOKEN` | Result |
 |---|---|---|
 | `https://...` (remote) | unset | **Refused at construction**, naming the variable. An absent credential is not consent to submit unauthenticated. |
 | `https://...` (remote) | set, blank | **Refused.** A blank value is never read as configured, so no empty bearer is ever sent. |
 | `https://...` (remote) | set | Sent stripped as `Authorization: Bearer ...`. |
 | `http://localhost...` | unset | Allowed: the zero-secret offline posture, the same loopback carve-out the https-only base-URL guard makes. |
 
-`HRZ7_S2S_SIGNING_KEY` follows the same rule for blank values (a blank HMAC key is a key everyone
+`HUMAN_REVIEW_S2S_SIGNING_KEY` follows the same rule for blank values (a blank HMAC key is a key everyone
 knows). When it is unset the signed-actor pair is **omitted** rather than sent unsigned: an
 unsigned claim of who submitted the review is worth less than no claim, and blocking the
 submission would stop an escalation reaching a human over a header nothing verifies yet.

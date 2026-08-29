@@ -18,8 +18,8 @@ from review_kit import (
 @pytest.fixture
 def configured_token(monkeypatch: pytest.MonkeyPatch) -> None:
     """A remote console needs a bearer, so these cases configure the obviously fictional one."""
-    monkeypatch.setenv("HRZ7_S2S_TOKEN", "fictional-demo-token")
-    monkeypatch.delenv("HRZ7_S2S_SIGNING_KEY", raising=False)
+    monkeypatch.setenv("HUMAN_REVIEW_S2S_TOKEN", "fictional-demo-token")
+    monkeypatch.delenv("HUMAN_REVIEW_S2S_SIGNING_KEY", raising=False)
 
 
 def _review(action: str = "disburse_facility") -> Review:
