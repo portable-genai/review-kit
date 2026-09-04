@@ -1,6 +1,6 @@
 """The environment has ONE reader, and no read may carry a permissive literal default.
 
-The standing gate for the absence-read-as-consent class, mirroring Hrz7
+The standing gate for the absence-read-as-consent class, mirroring human-review-console
 (``human-review-console/tests/test_profile_single_source.py``): this kit has no
 deployment profile to re-derive, so the guard is on the shape the class takes here. The
 fail-opens this class produces are spelled ``os.environ.get(name, <literal>)``, the two-state

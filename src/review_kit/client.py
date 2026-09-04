@@ -1,4 +1,5 @@
-"""The review-submission client: POST a review to an Hrz7-compatible service intake, S2S-authed.
+"""The review-submission client: POST a review to an human-review-console-compatible service intake,
+S2S-authed.
 
 Reuses the shared S2S transport hardening from ``hex-service-kit`` (the https-only base-URL guard
 and the bearer / signed-actor headers) rather than re-implementing it. The HTTP transport is
@@ -36,7 +37,8 @@ Transport = Callable[[str, bytes, Mapping[str, str], float], dict[str, Any]]
 _SERVICE_PATH = "/v1/service/reviews"
 _LOOPBACK_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 # The S2S actor headers, kept byte-for-byte compatible with hex-service-kit's server verifier
-# (``hex_service_kit.web.make_require_service_caller``) so Hrz7 accepts what this client sends.
+# (``hex_service_kit.web.make_require_service_caller``) so human-review-console accepts what this
+# client sends.
 _ACTOR_HEADER = "X-S2S-Actor"
 _ACTOR_SIG_HEADER = "X-S2S-Actor-Sig"
 
@@ -129,13 +131,19 @@ def _urllib_transport(
             payload: dict[str, Any] = json.loads(response.read().decode("utf-8"))
             return payload
     except urllib.error.HTTPError as exc:
-        raise ReviewClientError(f"Hrz7 review intake returned {exc.code}: {exc.reason}") from exc
+        raise ReviewClientError(
+            f"human-review-console review intake returned {exc.code}: {exc.reason}"
+        ) from exc
     except urllib.error.URLError as exc:
-        raise ReviewClientError(f"Hrz7 review intake unreachable: {exc.reason}") from exc
+        raise ReviewClientError(
+            f"human-review-console review intake unreachable: {exc.reason}"
+        ) from exc
 
 
 class ReviewClient:
-    """Submit a review to an Hrz7-compatible console at ``base_url`` (rule R8's client half)."""
+    """Submit a review to an human-review-console-compatible console at ``base_url`` (rule R8's
+    client half).
+    """
 
     def __init__(
         self,
@@ -155,7 +163,8 @@ class ReviewClient:
         # so it needs a bearer. Refusing HERE, beside the transport guard, turns a misconfigured
         # producer into a construction error rather than a review that silently leaves
         # unauthenticated and is rejected (or, on a misconfigured console, accepted) at the far
-        # end. Doc1 had hand-rolled exactly this rule around its own client; it belongs in the
+        # end. cdd-sow-research had hand-rolled exactly this rule around its own client; it belongs
+        # in the
         # shared primitive so every producer inherits it.
         self._token_required = not _is_loopback(self._base)
         self._resolve_credentials()
@@ -171,7 +180,7 @@ class ReviewClient:
         token = _resolve_secret(
             self._token_env,
             required=self._token_required,
-            purpose="the Hrz7 service bearer",
+            purpose="the human-review-console service bearer",
         )
         signing_key = _resolve_secret(
             self._signing_key_env,
@@ -196,4 +205,4 @@ class ReviewClient:
                 state=str(data.get("state", "pending")),
             )
         except (KeyError, TypeError) as exc:
-            raise ReviewClientError(f"malformed Hrz7 response: {data!r}") from exc
+            raise ReviewClientError(f"malformed human-review-console response: {data!r}") from exc

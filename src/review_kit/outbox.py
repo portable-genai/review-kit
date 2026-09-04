@@ -1,9 +1,11 @@
-"""A minimal transactional-outbox helper, so a review submission survives Hrz7 being down.
+"""A minimal transactional-outbox helper, so a review submission survives human-review-console being
+down.
 
-A producer enqueues the review durably as part of its own work, then a relay flushes pending
-reviews to Hrz7. On a submission failure the entry stays enqueued (retried on the next flush), so
-an escalation is never silently lost. The in-memory implementation exercises the pattern in tests
-and the offline demo; a real deployment binds a durable store (the same seam as the case store).
+A producer enqueues the review durably as part of its own work, then a relay flushes pending reviews
+to human-review-console. On a submission failure the entry stays enqueued (retried on the next
+flush), so an escalation is never silently lost. The in-memory implementation exercises the pattern
+in tests and the offline demo; a real deployment binds a durable store (the same seam as the case
+store).
 """
 
 from __future__ import annotations

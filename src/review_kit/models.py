@@ -1,9 +1,10 @@
-"""The review-submission payload: the wire shape a producer sends to Hrz7's service intake.
+"""The review-submission payload: the wire shape a producer sends to human-review-console's service
+intake.
 
-Domain-neutral: it names the maker-checker concepts (action, severity, approvals, segregation
-group) but no vertical policy. ``maker`` and ``tenant`` are asserted by the submitting service and
-trusted because the service is an authenticated S2S caller (Hrz7 verifies the caller, not the
-end user, on this path; per-hop OBO token-exchange is the deferred next layer).
+Domain-neutral: it names the maker-checker concepts (action, severity, approvals, segregation group)
+but no vertical policy. ``maker`` and ``tenant`` are asserted by the submitting service and trusted
+because the service is an authenticated S2S caller (human-review-console verifies the caller, not
+the end user, on this path; per-hop OBO token-exchange is the deferred next layer).
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ class Citation:
 
 @dataclass(frozen=True, slots=True)
 class Review:
-    """One item to route to Hrz7 for human review (four-eyes / maker-checker)."""
+    """One item to route to human-review-console for human review (four-eyes / maker-checker)."""
 
     action: str
     subject: str
@@ -31,7 +32,8 @@ class Review:
     required_approvals: int = 1
     sod_group: str = ""
     case_ref: str = ""
-    # A producer-owned, tenant-scoped key used by Hrz7 to make retried delivery idempotent.
+    # A producer-owned, tenant-scoped key used by human-review-console to make retried delivery
+    # idempotent.
     # Optional for wire compatibility with existing producers; new durable outboxes should set it.
     source_key: str = ""
     citations: tuple[Citation, ...] = field(default_factory=tuple)
@@ -57,7 +59,9 @@ class Review:
 
 @dataclass(frozen=True, slots=True)
 class ReviewSubmitted:
-    """The result of a successful submission: the id Hrz7 assigned and the resulting state."""
+    """The result of a successful submission: the id human-review-console assigned and the resulting
+    state.
+    """
 
     review_id: str
     tenant: str
