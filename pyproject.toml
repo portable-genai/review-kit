@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "review-kit"
-version = "0.0.1"
+version = "0.0.2"
 description = "The shared client for routing a requires_human_review escalation to an human-review-console-compatible Human-Review & Maker-Checker Console: a small, domain-neutral review-submission primitive plus an in-memory outbox, so every producer submits reviews the same way (rule R8) instead of copy-pasting an HTTP call."
 readme = "README.md"
 requires-python = ">=3.12"

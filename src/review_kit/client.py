@@ -154,11 +154,22 @@ class ReviewClient:
         signing_key_env: str = "HUMAN_REVIEW_S2S_SIGNING_KEY",
         timeout: float = 10.0,
         transport: Transport | None = None,
+        bearer_provider: Callable[[], str] | None = None,
     ) -> None:
+        """``bearer_provider``, when given, supplies the bearer for each submission instead of
+        ``token_env``.
+
+        It exists for a console that is reached through an identity-aware edge rather than
+        directly: the edge accepts only a short-lived token minted for its own audience, which
+        no static environment variable can hold. The provider is called once per submission, so
+        an expiring token is never reused, and a provider that returns a blank value is refused
+        exactly as a blank environment variable is.
+        """
         # https-only outside loopback; a plaintext non-loopback URL is refused at construction.
         self._base = _validate_base_url(base_url, service=service)
         self._token_env = token_env
         self._signing_key_env = signing_key_env
+        self._bearer_provider = bearer_provider
         # A console anywhere but this machine is reachable by something other than this process,
         # so it needs a bearer. Refusing HERE, beside the transport guard, turns a misconfigured
         # producer into a construction error rather than a review that silently leaves
@@ -167,7 +178,9 @@ class ReviewClient:
         # in the
         # shared primitive so every producer inherits it.
         self._token_required = not _is_loopback(self._base)
-        self._resolve_credentials()
+        # A provider mints per submission; calling it here would spend a token on construction.
+        if self._bearer_provider is None:
+            self._resolve_credentials()
         self._timeout = timeout
         self._transport: Transport = transport or _urllib_transport
 
@@ -177,11 +190,19 @@ class ReviewClient:
         Re-read on every submit rather than cached at construction, so a credential cleared or
         blanked after start-up cannot leave a long-lived client silently downgraded.
         """
-        token = _resolve_secret(
-            self._token_env,
-            required=self._token_required,
-            purpose="the human-review-console service bearer",
-        )
+        if self._bearer_provider is not None:
+            token = self._bearer_provider().strip()
+            if not token:
+                raise ValueError(
+                    "the bearer provider returned a blank token for the human-review-console "
+                    "service bearer; a blank credential is refused, never sent."
+                )
+        else:
+            token = _resolve_secret(
+                self._token_env,
+                required=self._token_required,
+                purpose="the human-review-console service bearer",
+            )
         signing_key = _resolve_secret(
             self._signing_key_env,
             required=False,
